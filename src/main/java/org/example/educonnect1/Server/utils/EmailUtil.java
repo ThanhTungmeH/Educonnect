@@ -7,8 +7,8 @@ import java.util.Properties;
 
 public class EmailUtil {
     public static void sendEmail(String to, String subject, String body) {
-        final String from = "thanhtunga0520@gmail.com";
-        final String password = "llffcswvroklddow";
+        final String from = "";
+        final String password = "";
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
