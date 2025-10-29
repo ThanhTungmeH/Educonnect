@@ -1,0 +1,40 @@
+
+
+#btlogin {
+    -fx-background-color: linear-gradient(to right,#00FFFF,#7FFFD4,#EE82EE ,#FF66FF) ;
+
+    -fx-background-radius: 20 ;
+}
+#btlogin:hover{
+-fx-background-color: lightgray;
+}
+#btlogin:pressed{
+    -fx-background-color: steelblue;
+}
+.border{
+    -fx-background-radius: 10;
+
+}
+#btsignup {
+    -fx-background-color: linear-gradient(to right,#00FFFF,#7FFFD4,#EE82EE ,#FF66FF) ;
+
+    -fx-background-radius: 20 ;
+}
+
+
+#btsignup:hover{
+    -fx-background-color: lightgray;
+}
+#btsignup:pressed{
+    -fx-background-color: steelblue;
+}
+.btn{
+    -fx-background-color: #7FFFD4;
+}
+.btn:hover{
+    -fx-background-color: lightgray;
+}
+
+.lb:hover{
+    -fx-text-fill: pink;
+}

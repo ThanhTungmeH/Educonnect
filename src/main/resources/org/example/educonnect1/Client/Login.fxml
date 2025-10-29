@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.educonnect1.client.controllers.Login">
+    <children>
+        <Pane layoutX="656.0" prefHeight="700.0" prefWidth="643.0">
+            <children>
+                <Button id="btlogin" fx:id="btnsignin" layoutX="171.0" layoutY="369.0" mnemonicParsing="false" onAction="#handleLogin" prefHeight="51.0" prefWidth="336.0" text="Sign in" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Button>
+                <ImageView fitHeight="110.0" fitWidth="90.0" layoutX="180.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <!-- optional image -->
+                    </image>
+                </ImageView>
+                <Label layoutX="287.0" layoutY="122.0" prefHeight="50.0" prefWidth="160.0" text="Login">
+                    <font>
+                        <Font name="System Bold" size="36.0" />
+                    </font>
+                </Label>
+                <ImageView fitHeight="26.0" fitWidth="30.0" layoutX="50.0" layoutY="210.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                    </image>
+                </ImageView>
+                <TextField fx:id="EmailTextfield" layoutX="171.0" layoutY="201.0" prefHeight="45.0" prefWidth="336.0" promptText="Email" />
+                <ImageView fitHeight="26.0" fitWidth="26.0" layoutX="50.0" layoutY="270.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                    </image>
+                </ImageView>
+                <Label fx:id="forgotPW" layoutX="173.0" layoutY="328.0" onMouseClicked="#SwitchToForgetPW" prefHeight="22.0" prefWidth="194.0" styleClass="lb" text="Forgot Password?" textFill="#a19797" />
+                <Label layoutX="180.0" layoutY="499.0" prefHeight="22.0" prefWidth="140.0" text="Not a member? " textFill="#847b7b" />
+                <Label fx:id="labelSigup" layoutX="274.0" layoutY="499.0" onMouseClicked="#SwitchToSignup" prefHeight="22.0" prefWidth="65.0" styleClass="lb" text="Sign up" textFill="#3e48ff" />
+                <PasswordField fx:id="PasswordtextField" layoutX="171.0" layoutY="261.0" prefHeight="45.0" prefWidth="336.0" promptText="Password" />
+            </children>
+        </Pane>
+
+        <Pane prefHeight="700.0" prefWidth="655.0" style="-fx-background-color:#F7DF9A;">
+            <children>
+                <ImageView fitHeight="433.0" fitWidth="655.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                     <Image url="@../../../img/img.png" />
+                    </image>
+                </ImageView>
+            </children>
+        </Pane>
+    </children>
+</AnchorPane>

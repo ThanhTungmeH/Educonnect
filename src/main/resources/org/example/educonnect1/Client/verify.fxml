@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Font?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.educonnect1.client.controllers.VerifyController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <children>
+        <Label layoutX="240.0" layoutY="50.0" text="Verify Account">
+            <font>
+                <Font size="28.0"/>
+            </font>
+        </Label>
+
+        <Label layoutX="150.0" layoutY="130.0" text="Enter the 6-digit code sent to your email:"/>
+        <TextField fx:id="codeField" layoutX="150.0" layoutY="160.0" prefWidth="300.0" promptText="Verification code"/>
+
+        <Button text="Verify"
+                fx:id="btnVerify"
+                layoutX="150.0"
+                layoutY="220.0"
+                prefWidth="300.0"
+                onAction="#handleVerify"/>
+
+        <Label fx:id="statusLabel"
+               layoutX="150.0"
+               layoutY="280.0"
+               prefWidth="300.0"
+               textFill="RED"
+               alignment="CENTER"/>
+    </children>
+</AnchorPane>
