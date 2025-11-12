@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.educonnect1.client.controllers.SearchFriendController"
+      spacing="15"
+      style="-fx-background-color: #f5f5f5; -fx-padding: 20px;">
+
+    <Label text="Search Results" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox fx:id="resultsContainer" spacing="10" style="-fx-padding: 10px;"/>
+    </ScrollPane>
+
+</VBox>

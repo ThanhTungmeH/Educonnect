@@ -17,9 +17,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import org.example.educonnect1.client.models.User;
 import org.example.educonnect1.client.utils.SessionManager;
+import org.example.educonnect1.client.utils.SocketManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -44,6 +46,7 @@ public class MainLayoutController implements Initializable {
     }
 
     public void onFriends(ActionEvent actionEvent) {
+        showView("FriendsList.fxml");
     }
 
     public void onGroups(ActionEvent actionEvent) {
@@ -53,6 +56,7 @@ public class MainLayoutController implements Initializable {
     }
 
     public void onMessages(ActionEvent actionEvent) {
+        showView("Chat.fxml");
     }
 
     public void onProfile(MouseEvent mouseEvent) {
@@ -68,7 +72,47 @@ public class MainLayoutController implements Initializable {
 
     public void Search(ActionEvent actionEvent) {
         String query = searchField.getText().trim();
+        if (query.isEmpty()) {
+            System.out.println("Search query is empty");
+            return;
+        }
 
+        new Thread(() -> {
+            try {
+                SocketManager socket = SocketManager.getInstance();
+                socket.sendRequest("SEARCH_FRIEND", query);
+                Object response = socket.readResponse();
+                
+                if (response instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<User> users = (List<User>) response;
+                    
+                    javafx.application.Platform.runLater(() -> {
+                        try {
+                            URL fxmlUrl = getClass().getResource("/org/example/educonnect1/Client/SearchFriend.fxml");
+                            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+                            Parent view = loader.load();
+                            
+                            SearchFriendController controller = loader.getController();
+                            controller.displayResults(users);
+                            
+                            contentPane.getChildren().clear();
+                            contentPane.getChildren().add(view);
+                            
+                            System.out.println("✅ Search completed: " + users.size() + " results");
+                        } catch (IOException e) {
+                            System.err.println("❌ Error loading search view: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    });
+                } else {
+                    System.err.println("Unexpected response type: " + response);
+                }
+            } catch (Exception e) {
+                System.err.println("Search failed: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {

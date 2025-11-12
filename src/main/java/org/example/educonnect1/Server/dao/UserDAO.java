@@ -129,7 +129,7 @@ public class UserDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + name + "%");
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     User u = new User();
                     u.setId(rs.getInt("id"));
                     u.setFullName(rs.getString("full_name"));
