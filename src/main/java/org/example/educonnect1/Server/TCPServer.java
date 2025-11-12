@@ -69,8 +69,8 @@ public class TCPServer {
         commandMap.put("LOGIN", new LoginCommand(userDAO));
         commandMap.put("SIGNUP", new SignupCommand(userDAO));
         commandMap.put("VERIFY", new VerifyCommand(userDAO));
+        commandMap.put("SEARCH_FRIEND", new SearchFriendCommand(userDAO));
         // Thêm các commands khác ở đây
-        // commandMap.put("SEARCH_FRIEND", new SearchFriendCommand(userDAO));
         // commandMap.put("UPDATE_PROFILE", new UpdateProfileCommand(userDAO));
     }
 
