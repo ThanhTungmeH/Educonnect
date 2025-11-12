@@ -1,6 +1,8 @@
 package org.example.educonnect1.Server;
 
 import org.example.educonnect1.Server.Commands.*;
+import org.example.educonnect1.Server.dao.FriendDAO;
+import org.example.educonnect1.Server.dao.MessageDAO;
 import org.example.educonnect1.Server.dao.UserDAO;
 
 import java.io.*;
@@ -15,6 +17,8 @@ public class TCPServer {
     private static final int SOCKET_TIMEOUT = 5 * 60 * 1000; // 5 phút timeout
 
     private static UserDAO userDAO = new UserDAO();
+    private static MessageDAO messageDAO = new MessageDAO();
+    private static FriendDAO friendDAO = new FriendDAO();
     private static Map<String, Command> commandMap = new HashMap<>();
     private static ExecutorService threadPool;
     private static ServerSocket serverSocket;
@@ -70,8 +74,19 @@ public class TCPServer {
         commandMap.put("SIGNUP", new SignupCommand(userDAO));
         commandMap.put("VERIFY", new VerifyCommand(userDAO));
         commandMap.put("SEARCH_FRIEND", new SearchFriendCommand(userDAO));
-        // Thêm các commands khác ở đây
-        // commandMap.put("UPDATE_PROFILE", new UpdateProfileCommand(userDAO));
+        
+        // Message commands
+        commandMap.put("SEND_MESSAGE", new SendMessageCommand(messageDAO));
+        commandMap.put("GET_CONVERSATIONS", new GetConversationsCommand(messageDAO));
+        commandMap.put("GET_MESSAGES", new GetMessagesCommand(messageDAO));
+        commandMap.put("MARK_MESSAGES_READ", new MarkMessagesReadCommand(messageDAO));
+        
+        // Friend commands
+        commandMap.put("ADD_FRIEND", new AddFriendCommand(friendDAO));
+        commandMap.put("ACCEPT_FRIEND", new AcceptFriendCommand(friendDAO));
+        commandMap.put("REJECT_FRIEND", new RejectFriendCommand(friendDAO));
+        commandMap.put("GET_FRIENDS", new GetFriendsCommand(friendDAO));
+        commandMap.put("GET_FRIEND_REQUESTS", new GetFriendRequestsCommand(friendDAO));
     }
 
     /**
