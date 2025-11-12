@@ -46,6 +46,7 @@ public class MainLayoutController implements Initializable {
     }
 
     public void onFriends(ActionEvent actionEvent) {
+        showView("FriendsList.fxml");
     }
 
     public void onGroups(ActionEvent actionEvent) {
@@ -55,6 +56,7 @@ public class MainLayoutController implements Initializable {
     }
 
     public void onMessages(ActionEvent actionEvent) {
+        showView("Chat.fxml");
     }
 
     public void onProfile(MouseEvent mouseEvent) {

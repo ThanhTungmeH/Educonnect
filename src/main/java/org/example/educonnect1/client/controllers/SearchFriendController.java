@@ -13,6 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import org.example.educonnect1.client.models.User;
+import org.example.educonnect1.client.utils.SessionManager;
+import org.example.educonnect1.client.utils.SocketManager;
 
 import java.net.URL;
 import java.util.List;
@@ -97,7 +99,27 @@ public class SearchFriendController implements Initializable {
     }
 
     private void handleAddFriend(User user) {
-        // TODO: Implement add friend functionality
-        System.out.println("Add friend request sent to: " + user.getFullName());
+        new Thread(() -> {
+            try {
+                User currentUser = SessionManager.getCurrentUser();
+                SocketManager socket = SocketManager.getInstance();
+                socket.sendRequest("ADD_FRIEND", currentUser.getId(), user.getId());
+                Object response = socket.readResponse();
+                
+                if ("SUCCESS".equals(response)) {
+                    Platform.runLater(() -> {
+                        System.out.println("Friend request sent to: " + user.getFullName());
+                        // Show success message
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        System.out.println("Failed to send friend request");
+                    });
+                }
+            } catch (Exception e) {
+                System.err.println("Error sending friend request: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
