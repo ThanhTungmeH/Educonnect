@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 public class LoginCommand implements Command {
     private UserDAO userDAO;
     public LoginCommand(UserDAO userDAO) { this.userDAO = userDAO; }
-
     @Override
     public void execute(ObjectInputStream in, ObjectOutputStream out) throws Exception {
         String email = (String) in.readObject();

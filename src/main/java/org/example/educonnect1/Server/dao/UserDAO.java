@@ -38,7 +38,7 @@ public class UserDAO {
     }
 
     public User findByEmail(String email) {
-        String sql = "SELECT id, email, password, is_verified, verification_code, verification_expiry from users where email=?";
+        String sql = "SELECT * from users where email=?";
         try (
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -48,6 +48,9 @@ public class UserDAO {
                     u.setId(rs.getInt("id"));
                     u.setEmail(rs.getString("email"));
                     u.setPassword(rs.getString("password"));
+                    u.setFullName(rs.getString("full_name"));
+                    u.setAvatar(rs.getString("avatar"));
+                    u.setRole(rs.getString("role"));
                     u.setVerified(rs.getBoolean("is_verified"));
                     u.setVerificationCode(rs.getString("verification_code"));
                     Timestamp t = rs.getTimestamp("verification_expiry");

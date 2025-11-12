@@ -20,5 +20,6 @@ public class Main extends Application {
         stage.setResizable(false);
         stage.show();
     }
+
 }
 

@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="feed-scroll" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <VBox alignment="TOP_CENTER" maxWidth="866.0" spacing="0" styleClass="feed">
+        <!-- COVER IMAGE -->
+        <HBox prefHeight="250.0" prefWidth="829.0" styleClass="profile-cover">
+            <ImageView fitHeight="250.0" fitWidth="829.0" preserveRatio="true" />
+            <Region HBox.hgrow="ALWAYS" />
+        </HBox>
+
+        <!-- PROFILE INFO SECTION -->
+        <VBox spacing="20" styleClass="profile-info-section">
+            <padding>
+                <Insets bottom="30" left="20" right="20" top="-60" />
+            </padding>
+
+            <!-- Profile Header with Avatar -->
+            <HBox alignment="BOTTOM_LEFT" spacing="20">
+                <!-- Avatar -->
+                <StackPane prefHeight="120.0" prefWidth="120.0">
+                    <Circle radius="60" styleClass="profile-avatar-border" />
+                    <Circle radius="58" styleClass="avatar" />
+                </StackPane>
+
+                <!-- User Info -->
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="15" />
+                    </padding>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label styleClass="profile-name" text="Nguyễn Văn A">
+                            <font><Font name="System Bold" size="28" /></font>
+                        </Label>
+                        <Label styleClass="verified-badge" text="✓">
+                            <font><Font size="18" /></font>
+                        </Label>
+                    </HBox>
+                    <Label styleClass="profile-username" >
+                        <font><Font size="14" /></font>
+                    </Label>
+                    <Label styleClass="profile-bio" text="📚 Sinh viên | 💻 Lập trình viên đam mê | 🚀 AI Enthusiast" wrapText="true">
+                        <font><Font size="13" /></font>
+                    </Label>
+                </VBox>
+
+                <!-- Action Buttons -->
+                <VBox spacing="10" alignment="TOP_CENTER">
+                    <Button styleClass="btn-edit-profile" text="✏️ Chỉnh sửa trang cá nhân">
+                        <font><Font name="System Bold" size="12" /></font>
+                    </Button>
+                    <Button styleClass="btn-add-story" text="📷 Thêm tin">
+                        <font><Font name="System Bold" size="12" /></font>
+                    </Button>
+                </VBox>
+            </HBox>
+
+            <!-- Stats Section -->
+            <HBox alignment="CENTER_LEFT" spacing="30" styleClass="profile-stats">
+                <padding>
+                    <Insets bottom="10" left="0" right="0" top="10" />
+                </padding>
+
+                <VBox alignment="CENTER" spacing="4">
+                    <Label styleClass="stat-number" text="245">
+                        <font><Font name="System Bold" size="20" /></font>
+                    </Label>
+                    <Label styleClass="stat-label" text="Bạn bè">
+                        <font><Font size="12" /></font>
+                    </Label>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="stat-separator" />
+
+                <VBox alignment="CENTER" spacing="4">
+                    <Label styleClass="stat-number" text="1.2K">
+                        <font><Font name="System Bold" size="20" /></font>
+                    </Label>
+                    <Label styleClass="stat-label" text="Người theo dõi">
+                        <font><Font size="12" /></font>
+                    </Label>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="stat-separator" />
+
+                <VBox alignment="CENTER" spacing="4">
+                    <Label styleClass="stat-number" text="342">
+                        <font><Font name="System Bold" size="20" /></font>
+                    </Label>
+                    <Label styleClass="stat-label" text="Bài viết">
+                        <font><Font size="12" /></font>
+                    </Label>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="stat-separator" />
+
+                <VBox alignment="CENTER" spacing="4">
+                    <Label styleClass="stat-number" text="12">
+                        <font><Font name="System Bold" size="20" /></font>
+                    </Label>
+                    <Label styleClass="stat-label" text="Nhóm">
+                        <font><Font size="12" /></font>
+                    </Label>
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <Separator styleClass="post-separator" />
+
+            <!-- About Section -->
+            <VBox spacing="12">
+                <Label styleClass="profile-section-title" text="Về tôi">
+                    <font><Font name="System Bold" size="16" /></font>
+                </Label>
+                <VBox spacing="8" styleClass="about-content">
+                    <padding>
+                        <Insets bottom="12" left="12" right="12" top="12" />
+                    </padding>
+                    <HBox spacing="12">
+                        <Label text="🎓" styleClass="about-icon">
+                            <font><Font size="16" /></font>
+                        </Label>
+                        <VBox spacing="2">
+                            <Label styleClass="about-label" text="Trường học">
+                                <font><Font name="System Bold" size="12" /></font>
+                            </Label>
+                            <Label styleClass="about-value" text="Đại học Bách Khoa Hà Nội">
+                                <font><Font size="12" /></font>
+                            </Label>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="12">
+                        <Label text="💼" styleClass="about-icon">
+                            <font><Font size="16" /></font>
+                        </Label>
+                        <VBox spacing="2">
+                            <Label styleClass="about-label" text="Công việc">
+                                <font><Font name="System Bold" size="12" /></font>
+                            </Label>
+                            <Label styleClass="about-value" text="Software Developer tại TechCorp">
+                                <font><Font size="12" /></font>
+                            </Label>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="12">
+                        <Label text="📍" styleClass="about-icon">
+                            <font><Font size="16" /></font>
+                        </Label>
+                        <VBox spacing="2">
+                            <Label styleClass="about-label" text="Địa chỉ">
+                                <font><Font name="System Bold" size="12" /></font>
+                            </Label>
+                            <Label styleClass="about-value" text="Hà Nội, Việt Nam">
+                                <font><Font size="12" /></font>
+                            </Label>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="12">
+                        <Label text="📅" styleClass="about-icon">
+                            <font><Font size="16" /></font>
+                        </Label>
+                        <VBox spacing="2">
+                            <Label styleClass="about-label" text="Ngày sinh">
+                                <font><Font name="System Bold" size="12" /></font>
+                            </Label>
+                            <Label styleClass="about-value" text="15 tháng 3, 2002">
+                                <font><Font size="12" /></font>
+                            </Label>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="12">
+                        <Label text="🔗" styleClass="about-icon">
+                            <font><Font size="16" /></font>
+                        </Label>
+                        <VBox spacing="2">
+                            <Label styleClass="about-label" text="Website">
+                                <font><Font name="System Bold" size="12" /></font>
+                            </Label>
+                            <Label styleClass="about-value" text="www.nguyenvana.com">
+                                <font><Font size="12" /></font>
+                            </Label>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <Separator styleClass="post-separator" />
+
+            <!-- Skills Section -->
+            <VBox spacing="12">
+                <Label styleClass="profile-section-title" text="Kỹ năng">
+                    <font><Font name="System Bold" size="16" /></font>
+                </Label>
+                <HBox spacing="8" >
+                    <padding>
+                        <Insets left="0" right="0" />
+                    </padding>
+                    <Button styleClass="skill-tag" text="Java">
+                        <font><Font name="System Bold" size="11" /></font>
+                    </Button>
+                    <Button styleClass="skill-tag" text="Python">
+                        <font><Font name="System Bold" size="11" /></font>
+                    </Button>
+                    <Button styleClass="skill-tag" text="JavaScript">
+                        <font><Font name="System Bold" size="11" /></font>
+                    </Button>
+                    <Button styleClass="skill-tag" text="Machine Learning">
+                        <font><Font name="System Bold" size="11" /></font>
+                    </Button>
+                    <Button styleClass="skill-tag" text="Web Development">
+                        <font><Font name="System Bold" size="11" /></font>
+                    </Button>
+                    <Button styleClass="skill-tag" text="JavaFX">
+                        <font><Font name="System Bold" size="11" /></font>
+                    </Button>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- POSTS SECTION -->
+        <VBox spacing="16" styleClass="profile-posts">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="30" />
+            </padding>
+
+            <Label styleClass="profile-section-title" text="Bài viết của tôi">
+                <font><Font name="System Bold" size="16" /></font>
+            </Label>
+
+            <!-- POST 1 -->
+            <VBox spacing="12" styleClass="post-card">
+                <padding>
+                    <Insets bottom="14" left="16" right="16" top="16" />
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Circle radius="20" styleClass="avatar" />
+                    <VBox spacing="3" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="6">
+                            <Label styleClass="post-author" text="Nguyễn Văn A">
+                                <font><Font name="System Bold" size="14" /></font>
+                            </Label>
+                            <Label styleClass="verified-badge" text="✓">
+                                <font><Font size="13" /></font>
+                            </Label>
+                        </HBox>
+                        <Label styleClass="post-time" text="1 tuần trước • 🌍 Công khai">
+                            <font><Font size="12" /></font>
+                        </Label>
+                    </VBox>
+                    <Button styleClass="post-menu-btn" text="•••">
+                        <font><Font name="System Bold" size="18" /></font>
+                    </Button>
+                </HBox>
+
+                <Label styleClass="post-content" text="Vừa hoàn thành một dự án AI cực kỳ thú vị! Sử dụng TensorFlow và Python để xây dựng model dự đoán giá nhà. Độ chính xác đạt 92%! 🎉 Cảm ơn mọi người đã hỗ trợ!" wrapText="true">
+                    <font><Font size="14" /></font>
+                </Label>
+
+                <HBox alignment="CENTER_LEFT" spacing="10" styleClass="post-stats">
+                    <Label styleClass="reaction-count" text="👍❤️🔥 512">
+                        <font><Font size="13" /></font>
+                    </Label>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label styleClass="stat-text" text="48 bình luận">
+                        <font><Font size="13" /></font>
+                    </Label>
+                    <Label styleClass="stat-dot" text="•">
+                        <font><Font size="10" /></font>
+                    </Label>
+                    <Label styleClass="stat-text" text="62 chia sẻ">
+                        <font><Font size="13" /></font>
+                    </Label>
+                </HBox>
+
+                <Separator styleClass="post-separator" />
+
+                <HBox alignment="CENTER" spacing="4">
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="👍 Thích" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="💬 Bình luận" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="↗️ Chia sẻ" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                </HBox>
+            </VBox>
+
+            <!-- POST 2 -->
+            <VBox spacing="12" styleClass="post-card">
+                <padding>
+                    <Insets bottom="14" left="16" right="16" top="16" />
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Circle radius="20" styleClass="avatar" />
+                    <VBox spacing="3" HBox.hgrow="ALWAYS">
+                        <Label styleClass="post-author" text="Nguyễn Văn A">
+                            <font><Font name="System Bold" size="14" /></font>
+                        </Label>
+                        <Label styleClass="post-time" text="2 tuần trước • 👥 Bạn bè">
+                            <font><Font size="12" /></font>
+                        </Label>
+                    </VBox>
+                    <Button styleClass="post-menu-btn" text="•••">
+                        <font><Font name="System Bold" size="18" /></font>
+                    </Button>
+                </HBox>
+
+                <Label styleClass="post-content" text="Tham gia workshop 'Advanced Java Programming' hôm nay, học được rất nhiều điều hữu ích về Multithreading và Stream API. Cảm ơn các anh chị tổ chức! 🙏✨" wrapText="true">
+                    <font><Font size="14" /></font>
+                </Label>
+
+                <HBox alignment="CENTER_LEFT" spacing="10" styleClass="post-stats">
+                    <Label styleClass="reaction-count" text="👍❤️ 298">
+                        <font><Font size="13" /></font>
+                    </Label>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label styleClass="stat-text" text="35 bình luận">
+                        <font><Font size="13" /></font>
+                    </Label>
+                    <Label styleClass="stat-dot" text="•">
+                        <font><Font size="10" /></font>
+                    </Label>
+                    <Label styleClass="stat-text" text="28 chia sẻ">
+                        <font><Font size="13" /></font>
+                    </Label>
+                </HBox>
+
+                <Separator styleClass="post-separator" />
+
+                <HBox alignment="CENTER" spacing="4">
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="👍 Thích" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="💬 Bình luận" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="↗️ Chia sẻ" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                </HBox>
+            </VBox>
+
+            <!-- POST 3 -->
+            <VBox spacing="12" styleClass="post-card">
+                <padding>
+                    <Insets bottom="14" left="16" right="16" top="16" />
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Circle radius="20" styleClass="avatar" />
+                    <VBox spacing="3" HBox.hgrow="ALWAYS">
+                        <Label styleClass="post-author" text="Nguyễn Văn A">
+                            <font><Font name="System Bold" size="14" /></font>
+                        </Label>
+                        <Label styleClass="post-time" text="1 tháng trước • 🌍 Công khai">
+                            <font><Font size="12" /></font>
+                        </Label>
+                    </VBox>
+                    <Button styleClass="post-menu-btn" text="•••">
+                        <font><Font name="System Bold" size="18" /></font>
+                    </Button>
+                </HBox>
+
+                <Label styleClass="post-content" text="🚀 Excited để chia sẻ rằng mình vừa được nhận job offer từ Google! After months of preparation and interviews, finally made it! Cảm ơn tất cả mọi người đã support tôi trong hành trình này! 🎊" wrapText="true">
+                    <font><Font size="14" /></font>
+                </Label>
+
+                <HBox alignment="CENTER_LEFT" spacing="10" styleClass="post-stats">
+                    <Label styleClass="reaction-count" text="👍❤️🎉 1.2K">
+                        <font><Font size="13" /></font>
+                    </Label>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label styleClass="stat-text" text="156 bình luận">
+                        <font><Font size="13" /></font>
+                    </Label>
+                    <Label styleClass="stat-dot" text="•">
+                        <font><Font size="10" /></font>
+                    </Label>
+                    <Label styleClass="stat-text" text="234 chia sẻ">
+                        <font><Font size="13" /></font>
+                    </Label>
+                </HBox>
+
+                <Separator styleClass="post-separator" />
+
+                <HBox alignment="CENTER" spacing="4">
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="👍 Thích" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="💬 Bình luận" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                    <Button maxWidth="Infinity" styleClass="post-interact-btn" text="↗️ Chia sẻ" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="14" /></font>
+                    </Button>
+                </HBox>
+            </VBox>
+
+            <!-- BOTTOM SPACE -->
+            <Region prefHeight="60" />
+        </VBox>
+    </VBox>
+</ScrollPane>
