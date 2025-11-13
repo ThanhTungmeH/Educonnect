@@ -81,6 +81,13 @@ public class TCPServer {
         commandMap.put("GET_MESSAGES", new GetMessagesCommand(messageDAO));
         commandMap.put("MARK_MESSAGES_READ", new MarkMessagesReadCommand(messageDAO));
         
+        // Enhanced message commands
+        commandMap.put("SEND_TYPING", new SendTypingCommand(messageDAO));
+        commandMap.put("GET_TYPING_STATUS", new GetTypingStatusCommand(messageDAO));
+        commandMap.put("ADD_REACTION", new AddReactionCommand(messageDAO));
+        commandMap.put("EDIT_MESSAGE", new EditMessageCommand(messageDAO));
+        commandMap.put("DELETE_MESSAGE", new DeleteMessageCommand(messageDAO));
+        
         // Friend commands
         commandMap.put("ADD_FRIEND", new AddFriendCommand(friendDAO));
         commandMap.put("ACCEPT_FRIEND", new AcceptFriendCommand(friendDAO));
