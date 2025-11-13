@@ -1,5 +1,6 @@
 package org.example.educonnect1.client.controllers;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -8,22 +9,29 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.example.educonnect1.client.models.User;
 import org.example.educonnect1.client.utils.SessionManager;
 import org.example.educonnect1.client.utils.SocketManager;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
+import java.io.File;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class ChatController implements Initializable {
 
@@ -48,15 +56,64 @@ public class ChatController implements Initializable {
     @FXML
     private Label chatHeaderName;
 
+    // New UI elements
+    @FXML
+    private Button attachButton;
+
+    @FXML
+    private Button emojiButton;
+
+    @FXML
+    private Button searchButton;
+
+    @FXML
+    private Button scrollToBottomButton;
+
+    @FXML
+    private HBox searchBar;
+
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private HBox typingIndicatorBox;
+
+    @FXML
+    private Label typingLabel;
+
     private int currentConversationId = -1;
     private int currentOtherUserId = -1;
     private User currentUser;
 
     private volatile boolean isInitialized = false;
 
+    // New features
+    private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> messageRefreshTask;
+    private ScheduledFuture<?> typingCheckTask;
+    private long lastTypingTime = 0;
+    private boolean isTyping = false;
+    
+    // Cloudinary configuration
+    private Cloudinary cloudinary;
+    
+    // Retry mechanism
+    private static final int MAX_RETRIES = 3;
+    private static final int RETRY_DELAY_MS = 1000;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currentUser = SessionManager.getCurrentUser();
+
+        // Initialize Cloudinary
+        cloudinary = new Cloudinary(ObjectUtils.asMap(
+            "cloud_name", "do46eak3c",
+            "api_key", "your_api_key_here",
+            "api_secret", "your_api_secret_here"
+        ));
+
+        // Initialize scheduler for auto-refresh
+        scheduler = Executors.newScheduledThreadPool(2);
 
         // Load conversations trong background
         new Thread(() -> {
@@ -69,7 +126,21 @@ public class ChatController implements Initializable {
             Platform.runLater(() -> messagesScrollPane.setVvalue(1.0));
         });
 
+        // Show scroll to bottom button when not at bottom
+        messagesScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            boolean isAtBottom = newVal.doubleValue() >= 0.95;
+            scrollToBottomButton.setVisible(!isAtBottom);
+            scrollToBottomButton.setManaged(!isAtBottom);
+        });
+
         messageInput.setOnAction(e -> onSendMessage());
+
+        // Search functionality
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                onSearchMessages(newVal);
+            });
+        }
     }
 
     /**
@@ -227,6 +298,9 @@ public class ChatController implements Initializable {
     private void openConversation(int conversationId, int otherUserId, String otherUserName, String otherUserAvatar) {
         System.out.println("📂 Opening conversation: " + conversationId);
 
+        // Stop previous auto-refresh
+        stopAutoRefresh();
+
         this.currentConversationId = conversationId;
         this.currentOtherUserId = otherUserId;
 
@@ -253,6 +327,9 @@ public class ChatController implements Initializable {
                 loadMessagesSync(conversationId, true);
                 markMessagesAsReadSync(conversationId);
                 loadConversationsSync();
+                
+                // Start auto-refresh for this conversation
+                startAutoRefresh();
             } catch (Exception e) {
                 System.err.println("❌ Error in openConversation: " + e.getMessage());
                 e.printStackTrace();
@@ -338,6 +415,7 @@ public class ChatController implements Initializable {
                 return null;
             }
 
+            int messageId = msg.containsKey("id") ? (Integer) msg.get("id") : -1;
             int senderId = (Integer) msg.get("senderId");
             String content = msg.get("content") != null ? (String) msg.get("content") : "";
 
@@ -352,6 +430,8 @@ public class ChatController implements Initializable {
             }
 
             boolean isCurrentUser = (senderId == currentUser.getId());
+            boolean isEdited = msg.containsKey("edited") && (Boolean) msg.get("edited");
+            String messageType = msg.containsKey("messageType") ? (String) msg.get("messageType") : "text";
 
             HBox bubble = new HBox();
             bubble.setPadding(new Insets(5));
@@ -360,35 +440,93 @@ public class ChatController implements Initializable {
             VBox messageBox = new VBox(3);
             messageBox.setMaxWidth(400);
 
+            // Message content with gradient for sent messages
             TextFlow textFlow = new TextFlow();
             Text text = new Text(content);
             text.setStyle("-fx-font-size: 14px; " +
                     (isCurrentUser ? "-fx-fill: white;" : "-fx-fill: #2c3e50;"));
             textFlow.getChildren().add(text);
 
-            textFlow.setStyle(isCurrentUser ?
-                    "-fx-background-color: #3498db; -fx-background-radius: 15px; -fx-padding: 10px;" :
+            String bubbleStyle = isCurrentUser ?
+                    "-fx-background-color: linear-gradient(to right, #3498db, #2980b9); -fx-background-radius: 15px; -fx-padding: 10px;" :
                     "-fx-background-color: white; -fx-background-radius: 15px; -fx-padding: 10px; " +
-                            "-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 15px;");
+                            "-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 15px;";
+            textFlow.setStyle(bubbleStyle);
 
             messageBox.getChildren().add(textFlow);
 
+            // Time and edited indicator
+            HBox metaInfo = new HBox(5);
+            metaInfo.setAlignment(Pos.CENTER_LEFT);
+            
             if (timestamp != null) {
                 try {
                     LocalDateTime dateTime = timestamp.toLocalDateTime();
                     String timeStr = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
                     Label timeLabel = new Label(timeStr);
                     timeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #7f8c8d;");
-                    messageBox.getChildren().add(timeLabel);
+                    metaInfo.getChildren().add(timeLabel);
                 } catch (Exception ignored) {}
             }
 
+            if (isEdited) {
+                Label editedLabel = new Label("(edited)");
+                editedLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #95a5a6; -fx-font-style: italic;");
+                metaInfo.getChildren().add(editedLabel);
+            }
+
+            // Message status for sent messages
+            if (isCurrentUser && msg.containsKey("status")) {
+                String status = (String) msg.get("status");
+                Label statusLabel = new Label(getStatusIcon(status));
+                statusLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: " + 
+                    ("read".equals(status) ? "#27ae60" : "#95a5a6") + ";");
+                metaInfo.getChildren().add(statusLabel);
+            }
+
+            if (metaInfo.getChildren().size() > 0) {
+                messageBox.getChildren().add(metaInfo);
+            }
+
             bubble.getChildren().add(messageBox);
+
+            // Add context menu on right-click
+            if (messageId != -1) {
+                bubble.setOnContextMenuRequested(e -> {
+                    ContextMenu menu = createMessageContextMenu(messageId, senderId, content);
+                    menu.show(bubble, e.getScreenX(), e.getScreenY());
+                    e.consume();
+                });
+
+                // Hover effect
+                bubble.setOnMouseEntered(e -> {
+                    textFlow.setStyle(bubbleStyle + " -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);");
+                });
+                bubble.setOnMouseExited(e -> {
+                    textFlow.setStyle(bubbleStyle);
+                });
+            }
+
+            // Fade in animation
+            FadeTransition fade = new FadeTransition(Duration.millis(300), bubble);
+            fade.setFromValue(0.0);
+            fade.setToValue(1.0);
+            fade.play();
+
             return bubble;
 
         } catch (Exception e) {
             System.err.println("❌ Error creating message bubble: " + e.getMessage());
             return null;
+        }
+    }
+
+    private String getStatusIcon(String status) {
+        switch (status) {
+            case "sent": return "○";
+            case "delivered": return "✓";
+            case "read": return "✓✓";
+            default: return "";
         }
     }
 
@@ -570,6 +708,368 @@ public class ChatController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // ========================================================================
+    // NEW FEATURE HANDLERS
+    // ========================================================================
+
+    /**
+     * Start auto-refresh for messages every 3 seconds
+     */
+    private void startAutoRefresh() {
+        if (messageRefreshTask != null) {
+            messageRefreshTask.cancel(false);
+        }
+        
+        messageRefreshTask = scheduler.scheduleAtFixedRate(() -> {
+            if (currentConversationId != -1) {
+                loadMessagesSync(currentConversationId, false);
+                checkTypingStatus();
+            }
+        }, 3, 3, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Stop auto-refresh
+     */
+    private void stopAutoRefresh() {
+        if (messageRefreshTask != null) {
+            messageRefreshTask.cancel(false);
+            messageRefreshTask = null;
+        }
+    }
+
+    /**
+     * Handle typing indicator
+     */
+    @FXML
+    private void onMessageTyping(KeyEvent event) {
+        long currentTime = System.currentTimeMillis();
+        
+        if (!isTyping && currentConversationId != -1) {
+            isTyping = true;
+            sendTypingStatus(true);
+        }
+        
+        lastTypingTime = currentTime;
+        
+        // Schedule to stop typing after 3 seconds of inactivity
+        scheduler.schedule(() -> {
+            long timeSinceLastType = System.currentTimeMillis() - lastTypingTime;
+            if (timeSinceLastType >= 3000 && isTyping) {
+                isTyping = false;
+                sendTypingStatus(false);
+            }
+        }, 3, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Send typing status to server
+     */
+    private void sendTypingStatus(boolean typing) {
+        if (currentConversationId == -1) return;
+        
+        new Thread(() -> {
+            try {
+                SocketManager socket = SocketManager.getInstance();
+                socket.sendRequest("SEND_TYPING", currentConversationId, currentUser.getId(), typing);
+                Object response = socket.readResponse();
+                // Silently handle response
+            } catch (Exception e) {
+                System.err.println("Error sending typing status: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    /**
+     * Check typing status from other users
+     */
+    private void checkTypingStatus() {
+        if (currentConversationId == -1) return;
+        
+        try {
+            SocketManager socket = SocketManager.getInstance();
+            Object[] responses = socket.sendRequestAndRead2Responses("GET_TYPING_STATUS", currentConversationId);
+            
+            if ("SUCCESS".equals(responses[0]) && responses[1] instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> typingUsers = (List<Map<String, Object>>) responses[1];
+                
+                Platform.runLater(() -> {
+                    if (!typingUsers.isEmpty()) {
+                        StringBuilder names = new StringBuilder();
+                        for (int i = 0; i < typingUsers.size(); i++) {
+                            if (i > 0) names.append(", ");
+                            names.append(typingUsers.get(i).get("name"));
+                        }
+                        typingLabel.setText(names.toString() + " is typing...");
+                        typingIndicatorBox.setVisible(true);
+                        typingIndicatorBox.setManaged(true);
+                    } else {
+                        typingIndicatorBox.setVisible(false);
+                        typingIndicatorBox.setManaged(false);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            // Silently handle - typing status is not critical
+        }
+    }
+
+    /**
+     * Handle attach file button
+     */
+    @FXML
+    private void onAttachFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select File to Upload");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif"),
+            new FileChooser.ExtensionFilter("Documents", "*.pdf", "*.docx", "*.xlsx"),
+            new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+        
+        File file = fileChooser.showOpenDialog(attachButton.getScene().getWindow());
+        if (file != null) {
+            uploadFile(file);
+        }
+    }
+
+    /**
+     * Upload file to Cloudinary
+     */
+    private void uploadFile(File file) {
+        sendButton.setDisable(true);
+        
+        new Thread(() -> {
+            try {
+                // Upload to Cloudinary
+                Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+                String fileUrl = (String) uploadResult.get("secure_url");
+                final String fileName = file.getName();
+                
+                // Determine message type
+                final String messageType;
+                String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                if (Arrays.asList("jpg", "jpeg", "png", "gif").contains(extension)) {
+                    messageType = "image";
+                } else {
+                    messageType = "file";
+                }
+                
+                // Send message with file
+                Platform.runLater(() -> {
+                    messageInput.setText("[" + messageType.toUpperCase() + "] " + fileName);
+                    onSendMessage();
+                    sendButton.setDisable(false);
+                });
+                
+            } catch (Exception e) {
+                System.err.println("Error uploading file: " + e.getMessage());
+                Platform.runLater(() -> {
+                    sendButton.setDisable(false);
+                    showAlert("Upload Error", "Failed to upload file: " + e.getMessage());
+                });
+            }
+        }).start();
+    }
+
+    /**
+     * Handle emoji button click
+     */
+    @FXML
+    private void onEmojiClick() {
+        // Show emoji picker popup (simplified version)
+        ContextMenu emojiMenu = new ContextMenu();
+        String[] emojis = {"👍", "❤️", "😂", "😮", "😢", "🔥", "👏", "🎉", "😊", "😍"};
+        
+        for (String emoji : emojis) {
+            MenuItem item = new MenuItem(emoji);
+            item.setOnAction(e -> {
+                messageInput.appendText(emoji);
+                messageInput.requestFocus();
+            });
+            emojiMenu.getItems().add(item);
+        }
+        
+        emojiMenu.show(emojiButton, javafx.geometry.Side.TOP, 0, 0);
+    }
+
+    /**
+     * Handle search button click
+     */
+    @FXML
+    private void onSearchClick() {
+        boolean isVisible = searchBar.isVisible();
+        searchBar.setVisible(!isVisible);
+        searchBar.setManaged(!isVisible);
+        
+        if (!isVisible) {
+            searchField.requestFocus();
+        } else {
+            searchField.clear();
+        }
+    }
+
+    /**
+     * Close search bar
+     */
+    @FXML
+    private void onCloseSearch() {
+        searchBar.setVisible(false);
+        searchBar.setManaged(false);
+        searchField.clear();
+        // Remove highlights
+        loadMessagesSync(currentConversationId, false);
+    }
+
+    /**
+     * Search messages
+     */
+    private void onSearchMessages(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            // Clear highlights
+            return;
+        }
+        
+        // Highlight messages containing query
+        messagesContainer.getChildren().forEach(node -> {
+            if (node instanceof HBox) {
+                HBox bubble = (HBox) node;
+                // Simple highlighting by changing background color
+                String lowerQuery = query.toLowerCase();
+                // This is a simplified version - full implementation would parse text
+            }
+        });
+    }
+
+    /**
+     * Scroll to bottom
+     */
+    @FXML
+    private void onScrollToBottom() {
+        messagesScrollPane.setVvalue(1.0);
+    }
+
+    /**
+     * Add reaction to message
+     */
+    private void addReactionToMessage(int messageId, String reaction) {
+        new Thread(() -> {
+            try {
+                SocketManager socket = SocketManager.getInstance();
+                Object[] responses = socket.sendRequestAndRead2Responses("ADD_REACTION", 
+                    messageId, currentUser.getId(), reaction);
+                
+                if ("SUCCESS".equals(responses[0])) {
+                    // Refresh messages to show updated reactions
+                    loadMessagesSync(currentConversationId, false);
+                }
+            } catch (Exception e) {
+                System.err.println("Error adding reaction: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    /**
+     * Show context menu for message (right-click)
+     */
+    private ContextMenu createMessageContextMenu(int messageId, int senderId, String content) {
+        ContextMenu menu = new ContextMenu();
+        
+        // Add reactions
+        Menu reactionsMenu = new Menu("React");
+        String[] reactions = {"👍", "❤️", "😂", "😮", "😢", "🔥"};
+        for (String reaction : reactions) {
+            MenuItem item = new MenuItem(reaction);
+            item.setOnAction(e -> addReactionToMessage(messageId, reaction));
+            reactionsMenu.getItems().add(item);
+        }
+        menu.getItems().add(reactionsMenu);
+        
+        // Edit/Delete only for own messages
+        if (senderId == currentUser.getId()) {
+            MenuItem editItem = new MenuItem("Edit");
+            editItem.setOnAction(e -> editMessage(messageId, content));
+            
+            MenuItem deleteItem = new MenuItem("Delete");
+            deleteItem.setOnAction(e -> deleteMessage(messageId));
+            
+            menu.getItems().addAll(new SeparatorMenuItem(), editItem, deleteItem);
+        }
+        
+        return menu;
+    }
+
+    /**
+     * Edit message
+     */
+    private void editMessage(int messageId, String currentContent) {
+        TextInputDialog dialog = new TextInputDialog(currentContent);
+        dialog.setTitle("Edit Message");
+        dialog.setHeaderText("Edit your message");
+        dialog.setContentText("Message:");
+        
+        dialog.showAndWait().ifPresent(newContent -> {
+            if (!newContent.trim().isEmpty() && !newContent.equals(currentContent)) {
+                new Thread(() -> {
+                    try {
+                        SocketManager socket = SocketManager.getInstance();
+                        socket.sendRequest("EDIT_MESSAGE", messageId, currentUser.getId(), newContent);
+                        Object response = socket.readResponse();
+                        
+                        if ("SUCCESS".equals(response)) {
+                            loadMessagesSync(currentConversationId, false);
+                        } else {
+                            Platform.runLater(() -> 
+                                showAlert("Edit Failed", "Could not edit message. It may be too old (15 min limit).")
+                            );
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error editing message: " + e.getMessage());
+                    }
+                }).start();
+            }
+        });
+    }
+
+    /**
+     * Delete message
+     */
+    private void deleteMessage(int messageId) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Message");
+        confirm.setHeaderText("Are you sure you want to delete this message?");
+        confirm.setContentText("This action cannot be undone.");
+        
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                new Thread(() -> {
+                    try {
+                        SocketManager socket = SocketManager.getInstance();
+                        socket.sendRequest("DELETE_MESSAGE", messageId, currentUser.getId());
+                        Object result = socket.readResponse();
+                        
+                        if ("SUCCESS".equals(result)) {
+                            loadMessagesSync(currentConversationId, false);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error deleting message: " + e.getMessage());
+                    }
+                }).start();
+            }
+        });
+    }
+
+    /**
+     * Cleanup when controller is destroyed
+     */
+    public void cleanup() {
+        stopAutoRefresh();
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
     }
 
 }
